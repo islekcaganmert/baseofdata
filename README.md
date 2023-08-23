@@ -5,7 +5,7 @@ Lightweight database system
 ***Upstream Version, Do Not Use in Production***
 ## Installing from Release
 ```
-$ wget https://github.com/islekcaganmert/baseofdata/releases/download/Preview/baseofdata-0.0.1-py3-none-any.whl
+$ wget https://github.com/islekcaganmert/baseofdata/releases/download/v0.0.1/baseofdata-0.0.1-py3-none-any.whl
 $ python3 -m pip install ./baseofdata-0.0.1-py3-none-any.whl
 ```
 ## Building
