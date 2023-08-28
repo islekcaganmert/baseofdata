@@ -1,5 +1,3 @@
-import base64
-
 class Data:
     def create(self, structure):
         data = ''
@@ -54,32 +52,30 @@ class Data:
         for block in open(self.filename, 'rb').read().split(b';'):
             if block.startswith(b'Info '):
                 info['version'] = block.split(b' ')[1].decode('UTF-8')
-        if info['version'] in ['v0.0.1']:
-            for block in open(self.filename, 'rb').read().split(b';'):
-                if block.startswith(b'Config '):
-                    for configblock in block.removeprefix(b'Config ').split(b' '):
-                        config.append([configblock.split(b':')[1].decode('UTF-8'), configblock.split(b':')[0].decode('UTF-8')])
-                elif block.startswith(b'Data '):
-                    i = 0
-                    c = 0
-                    cd = {'__id__':c}
-                    if not block == b'Data ':
-                        for datablock in block.removeprefix(b'Data ').split(b' '):
-                            if config[i][1] == 'String':
-                                encoded_hex_list = datablock.decode('ASCII').split('\\x')
-                                encoded_bytes = bytes.fromhex(''.join(encoded_hex_list))
-                                conv_data = encoded_bytes.decode('utf-8')
-                            elif config[i][1] == 'Integer': conv_data = int(datablock.decode('UTF-8'))
-                            elif config[i][1] == 'Float': conv_data = float(datablock.decode('UTF-8'))
-                            elif config[i][1] == 'Boolean': conv_data = bool(int(datablock.decode('UTF-8')))
-                            cd.update({config[i][0]:conv_data})
-                            if len(config)-1 == i:
-                                data.append(cd)
-                                i = 0
-                                c += 1
-                                cd = {'__id__':c}
-                            else:
-                                i+=1
+            elif block.startswith(b'Config '):
+                for configblock in block.removeprefix(b'Config ').split(b' '):
+                    config.append([configblock.split(b':')[1].decode('UTF-8'), configblock.split(b':')[0].decode('UTF-8')])
+            elif block.startswith(b'Data '):
+                i = 0
+                c = 0
+                cd = {'__id__':c}
+                if not block == b'Data ':
+                    for datablock in block.removeprefix(b'Data ').split(b' '):
+                        if config[i][1] == 'String':
+                            encoded_hex_list = datablock.decode('ASCII').split('\\x')
+                            encoded_bytes = bytes.fromhex(''.join(encoded_hex_list))
+                            conv_data = encoded_bytes.decode('utf-8')
+                        elif config[i][1] == 'Integer': conv_data = int(datablock.decode('UTF-8'))
+                        elif config[i][1] == 'Float': conv_data = float(datablock.decode('UTF-8'))
+                        elif config[i][1] == 'Boolean': conv_data = bool(int(datablock.decode('UTF-8')))
+                        cd.update({config[i][0]:conv_data})
+                        if len(config)-1 == i:
+                            data.append(cd)
+                            i = 0
+                            c += 1
+                            cd = {'__id__':c}
+                        else:
+                            i+=1
         self.data = data
     def add(self, **data):
         self.fetch()
@@ -147,11 +143,9 @@ class Data:
             for block in open(self.filename, 'rb').read().split(b';'):
                 if block.startswith(b'Info '):
                     info['version'] = block.split(b' ')[1].decode('UTF-8')
-            if info['version'] in ['v0.0.1']:
-                for block in open(self.filename, 'rb').read().split(b';'):
-                    if block.startswith(b'Config '):
-                        self.config = {}
-                        for configblock in block.removeprefix(b'Config ').split(b' '):
-                            self.config.update({configblock.split(b':')[1].decode('UTF-8'): configblock.split(b':')[0].decode('UTF-8')})
+                elif block.startswith(b'Config '):
+                    self.config = {}
+                    for configblock in block.removeprefix(b'Config ').split(b' '):
+                        self.config.update({configblock.split(b':')[1].decode('UTF-8'): configblock.split(b':')[0].decode('UTF-8')})
         except:
             pass
