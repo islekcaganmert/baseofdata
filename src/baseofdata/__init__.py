@@ -1,15 +1,4 @@
 class Data:
-    def create(self, structure):
-        data = ''
-        for column in structure:
-            column_name_check = column.lower()
-            for i in 'abcdefghijklmnopqrstuvwxyz1234567890':
-                column_name_check = column_name_check.replace(i, '')
-            if column_name_check == '':
-                if structure[column] in ['String', 'Integer', 'Float', 'Boolean']:
-                    data = data + ' ' + structure[column] + ':' + column
-        open(self.filename, 'wb').write(b'Info v0.0.1;Config'+data.encode('UTF-8')+b';Data ;')
-        self.fetch()
     def commit(self):
         filedata = b'Info v0.0.1;Config'
         for column in self.config:
@@ -77,53 +66,45 @@ class Data:
                         else:
                             i+=1
         self.data = data
+    def create(self, structure):
+        data = ''
+        for column in structure:
+            column_name_check = column.lower()
+            for i in 'abcdefghijklmnopqrstuvwxyz1234567890':
+                column_name_check = column_name_check.replace(i, '')
+            if column_name_check == '':
+                if structure[column] in ['String', 'Integer', 'Float', 'Boolean']:
+                    data = data + ' ' + structure[column] + ':' + column
+        open(self.filename, 'wb').write(b'Info v0.0.1;Config'+data.encode('UTF-8')+b';Data ;')
+        if self.autosync: self.fetch()
     def add(self, **data):
-        self.fetch()
-        filedata = open(self.filename, 'rb').read()
-        fileblocks = filedata.split(b';')
-        filedatablock = b''
-        for fileblock in fileblocks:
-            if fileblock.startswith(b'Data '):
-                filedatablock = fileblock
-        newdata = b' '
+        if self.autosync: self.fetch()
+        newdata = {'__id__':len(self.data)}
         for inp in self.config:
             if self.config[inp] == 'String': inp_type = str
             elif self.config[inp] == 'Integer': inp_type = int
             elif self.config[inp] == 'Float': inp_type = float
             elif self.config[inp] == 'Boolean': inp_type = bool
-            if type(data[inp]) == inp_type:
-                if self.config[inp] == 'String':
-                    encoded_hex_list = [f'\\x{byte:02x}'.encode('UTF-8') for byte in data[inp].encode('utf-8')]
-                    newdata+=b''.join(encoded_hex_list)
-                elif self.config[inp] == 'Integer':
-                    newdata+=str(data[inp]).encode('UTF-8')
-                elif self.config[inp] == 'Float':
-                    newdata+=str(data[inp]).encode('UTF-8')
-                elif self.config[inp] == 'Boolean':
-                    if data[inp]:
-                        newdata+=b'1'
-                    else:
-                        newdata+=b'0'
-            else:
+            if not type(data[inp]) == inp_type:
                 raise Exception("Data type is not acceptable")
-            newdata+=b' '
-        filedata = filedata.replace(filedatablock, (filedatablock+newdata.removesuffix(b' ')).replace(b'  ', b' '))
-        open(self.filename, 'wb').write(filedata)
-        self.fetch()
+            newdata.update({inp:data[inp]})
+        self.data.append(newdata)
+        if self.autosync: self.commit()
+        if self.autosync: self.fetch()
     def edit(self, __id__, **datas):
-        self.fetch()
+        if self.autosync: self.fetch()
         for data in datas:
             self.data[__id__][data] = datas[data]
-        self.commit()
-        self.fetch()
+        if self.autosync: self.commit()
+        if self.autosync: self.fetch()
     def remove(self, id):
-        self.fetch()
+        if self.autosync: self.fetch()
         newdata = []
         for data in self.data:
             if not data['__id__'] == id:
                 newdata.append(data)
         self.data = newdata
-        self.commit()
+        if self.autosync: self.commit()
     def get(self, **filters):
         columns = self.data
         results = []
@@ -137,8 +118,9 @@ class Data:
         self.filename = filename
         self.config = {}
         self.data = []
+        self.autosync = True
         try:
-            self.fetch()
+            if self.autosync: self.fetch()
             info = {'version':''}
             for block in open(self.filename, 'rb').read().split(b';'):
                 if block.startswith(b'Info '):

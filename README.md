@@ -1,12 +1,12 @@
-###### *Alpha Preview 0.0.2*
+###### *Alpha Preview 0.0.3*
 # baseofdata
 Lightweight database system
 
 ***Upstream Version, Do Not Use in Production***
 ## Installing from Release
 ```
-$ wget https://github.com/islekcaganmert/baseofdata/releases/download/v0.0.2/baseofdata-0.0.2-py3-none-any.whl
-$ python3 -m pip install ./baseofdata-0.0.2-py3-none-any.whl
+$ wget https://github.com/islekcaganmert/baseofdata/releases/download/v0.0.3/baseofdata-0.0.3-py3-none-any.whl
+$ python3 -m pip install ./baseofdata-0.0.3-py3-none-any.whl
 ```
 ## Building
 ```

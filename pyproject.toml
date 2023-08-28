@@ -1,6 +1,6 @@
 [project]
 name = "baseofdata"
-version = "0.0.2"
+version = "0.0.3"
 description = "Lightweight database system"
 readme = "README.md"
 license = {text = "GPL-3.0"}

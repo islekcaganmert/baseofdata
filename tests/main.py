@@ -1,6 +1,7 @@
 from baseofdata import Data
 
 db = Data('demo.Data')
+db.autosync = True
 
 db.create({
     'id': 'Integer',
